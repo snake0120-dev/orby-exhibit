@@ -1,0 +1,261 @@
+/* ═══════════════════════════════════════════
+   ORBY 전시용 자동재생 — 1920×1080 고정 캔버스
+   천우태 졸업전시
+   ═══════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Pretendard'; font-style: normal; font-weight: 400;
+  src: url('../font/Pretendard-Regular.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'Pretendard'; font-style: normal; font-weight: 500;
+  src: url('../font/Pretendard-Medium.woff2') format('woff2');
+  font-display: block;
+}
+@font-face {
+  font-family: 'Pretendard'; font-style: normal; font-weight: 700;
+  src: url('../font/Pretendard-Bold.woff2') format('woff2');
+  font-display: block;
+}
+:root {
+  --orange: #FF990E;
+  --ink:    #000000;
+  --gray:   #747474;
+  --ease:   cubic-bezier(.22, .61, .36, 1);
+  --in:     .72s;
+  --out:    .5s;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: none;                 /* 전시장 — 마우스는 보이지 않는다 */
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ── 무대 ──────────────────────────────────
+   1920×1080을 통째로 확대/축소해 화면에 맞춘다.
+   글자는 진짜 텍스트라 아무리 키워도 선명하다. */
+#stage {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 1920px; height: 1080px;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+/* ── 장 ────────────────────────────────── */
+.slide {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+.slide.is-live { visibility: visible; }
+
+/* 장마다 깔리는 불투명한 바탕.
+   다음 장이 이걸 들고 올라오면서 앞 장을 덮기 때문에
+   넘어가는 순간 배경이 비쳐 깜빡이는 일이 없다. */
+.plate { position: absolute; inset: 0; }
+.s1 .plate { background: #000; }
+.s2 .plate { background: #fff; }
+.s3 .plate { background: #f4f4f4; }
+.s4 .plate { background: #fff; }
+
+/* ── 사진 ─────────────────────────────── */
+.photo {
+  position: absolute;
+  display: block;
+  max-width: none;
+  max-height: none;
+}
+.photo--full  { left: 0; top: 0; width: 1920px; height: 1080px; }
+.photo--band  { left: 0; top: 0; width: 1920px; height: 588px; }
+
+/* 4장 — 오른쪽에 붙고 왼쪽으로 서서히 사라진다 (원본 측정: x 528에서 0, x 1641에서 1) */
+.photo--right {
+  left: 529px; top: 0; width: 1391px; height: 1080px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 80%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 80%);
+}
+
+/* 1장 — 글자가 놓이는 왼쪽을 어둡게 (원본 측정: x 0에서 100%, x 966에서 0%) */
+.scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,1) 0, rgba(0,0,0,0) 966px);
+}
+
+/* ── 심볼 ─────────────────────────────── */
+.sym {
+  position: absolute;
+  width: 50px; height: 50px;
+  fill: var(--orange);
+}
+.sym--s1 { left: 80px; top: 757px; fill: #fff; }
+
+/* ═══════════ 1장 ═══════════ */
+.s1 { color: #fff; }
+
+.logotype { position: absolute; left: 80px; top: 80px; width: 141px; height: 57px; }
+
+.s1__title {
+  position: absolute; left: 80px; top: 834px;
+  margin: 0;
+  font-size: 49px; font-weight: 700; line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.s1__quote {
+  position: absolute; left: 68px; top: 909px;
+  margin: 0;
+  font-size: 31.4px; font-weight: 400; line-height: 45px;
+  color: #fff;
+}
+.s1__quote .ln { display: block; white-space: nowrap; }
+.s1__quote .ln:last-child { padding-left: 11px; }
+
+/* ═══════════ 2장 ═══════════ */
+.s2__kicker {
+  position: absolute; left: 74px; top: 73px;
+  margin: 0;
+  font-size: 37.8px; font-weight: 700; line-height: 1;
+  color: #fff;
+}
+.s2__title {
+  position: absolute; left: 75px; top: 124px;
+  margin: 0;
+  font-size: 32.8px; font-weight: 700; line-height: 1;
+  color: var(--ink);
+}
+
+.col { position: absolute; top: 0; width: 573.5px; height: 1080px; }
+.col--1 { left: 80px; }
+.col--2 { left: 673.5px; }
+.col--3 { left: 1267px; }
+
+.col .sym { left: 0; top: 655px; }
+
+.col__label {
+  position: absolute; left: 51px; top: 709px;
+  margin: 0;
+  font-size: 20.7px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--orange);
+}
+.col__head {
+  position: absolute; left: 51px; top: 738px;
+  margin: 0;
+  font-size: 33.1px; font-weight: 700; line-height: 1;
+  color: var(--ink);
+}
+.col__list {
+  position: absolute; left: 63px; top: 793px;
+  margin: 0; padding: 0;
+  list-style: none;
+  font-size: 23.9px; font-weight: 500; line-height: 41px;
+  color: var(--gray);
+}
+.col__list li { position: relative; padding-left: 23px; }
+.col__list li::before {
+  content: '';
+  position: absolute; left: 1px; top: 18px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--gray);
+}
+
+/* ═══════════ 3·4장 ═══════════ */
+.sol__label {
+  position: absolute; left: 80px; top: 87px;
+  margin: 0;
+  font-size: 36.7px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--orange);
+}
+.sym--sol { left: 80px; }
+.s3 .sym--sol { top: 646px; }
+.s4 .sym--sol { top: 684px; }
+
+.sol__title {
+  position: absolute; left: 80px;
+  margin: 0;
+  font-size: 49px; font-weight: 700; line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+}
+.s3 .sol__title { top: 722px; }
+.s4 .sol__title { top: 759px; }
+
+.sol__body {
+  position: absolute; left: 80px;
+  margin: 0;
+  font-size: 23.7px; font-weight: 500; line-height: 41px;
+  color: var(--gray);
+}
+.sol__body .ln { display: block; white-space: nowrap; }
+.s3 .sol__body { top: 800px; }
+.s4 .sol__body { top: 836px; }
+
+/* ═══════════════════════════════════════════
+   등장 · 퇴장
+   요소마다 --d(지연)를 주고 차례로 올라온다.
+   transform / opacity만 건드려 GPU에서만 돈다 —
+   몇 시간을 틀어놔도 버벅이지 않는다.
+   ═══════════════════════════════════════════ */
+
+[data-e] {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity   var(--out) var(--ease) var(--d, 0ms),
+    transform var(--out) var(--ease) var(--d, 0ms);
+}
+
+[data-e="logo"],
+[data-e="sym"]   { transform: translateY(14px); }
+[data-e="label"] { transform: translateY(16px); }
+[data-e="title"] { transform: translateY(24px); }
+[data-e="body"]  { transform: translateY(16px); }
+
+.is-in [data-e] {
+  opacity: 1;
+  transform: none;
+  transition-duration: var(--in);
+}
+
+/* 퇴장 — 등장의 역순으로 위로 거둔다 */
+.is-out [data-e] { opacity: 0; }
+.is-out [data-e="logo"],
+.is-out [data-e="sym"]   { transform: translateY(-6px); }
+.is-out [data-e="label"] { transform: translateY(-8px); }
+.is-out [data-e="title"] { transform: translateY(-12px); }
+.is-out [data-e="body"]  { transform: translateY(-8px); }
+
+/* 바탕과 사진 — 글자보다 한 박자 먼저 자리를 잡는다.
+   글자가 물러난 뒤에도 그림은 그대로 남아 있다가,
+   다음 장의 그림이 그 위로 떠오르며 자리를 넘겨받는다. */
+.plate, .photo, .scrim {
+  opacity: 0;
+  transition: opacity var(--in) var(--ease);
+  will-change: opacity;
+}
+.is-in .plate, .is-in .photo, .is-in .scrim,
+.is-out .plate, .is-out .photo, .is-out .scrim { opacity: 1; }
+
+/* 모션 최소화 설정을 켠 기기에서는 움직임 없이 전환만 */
+@media (prefers-reduced-motion: reduce) {
+  [data-e], .photo, .scrim { transition-duration: .3s !important; }
+  [data-e] { transform: none !important; }
+}
