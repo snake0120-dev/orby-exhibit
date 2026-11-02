@@ -25,6 +25,7 @@
   --ease:   cubic-bezier(.22, .61, .36, 1);
   --in:     .72s;
   --out:    .5s;
+  --spin:   .95s;               /* 심볼이 한 바퀴 풀리는 데 쓰는 시간 */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -223,8 +224,7 @@ body {
     transform var(--out) var(--ease) var(--d, 0ms);
 }
 
-[data-e="logo"],
-[data-e="sym"]   { transform: translateY(14px); }
+[data-e="logo"]  { transform: translateY(14px); }
 [data-e="label"] { transform: translateY(16px); }
 [data-e="title"] { transform: translateY(24px); }
 [data-e="body"]  { transform: translateY(16px); }
@@ -237,11 +237,21 @@ body {
 
 /* 퇴장 — 등장의 역순으로 위로 거둔다 */
 .is-out [data-e] { opacity: 0; }
-.is-out [data-e="logo"],
-.is-out [data-e="sym"]   { transform: translateY(-6px); }
+.is-out [data-e="logo"] { transform: translateY(-6px); }
 .is-out [data-e="label"] { transform: translateY(-8px); }
 .is-out [data-e="title"] { transform: translateY(-12px); }
 .is-out [data-e="body"]  { transform: translateY(-8px); }
+
+/* 심볼은 제자리에서 돈다.
+   올라오거나 내려가지 않고 자기 중심을 축으로 삼아,
+   피어나듯 풀리며 들어왔다가 되감기듯 돌아 나간다.
+   뒤의 규칙이라 위의 공통 규칙을 덮는다. */
+[data-e="sym"] {
+  transform-origin: 50% 50%;
+  transform: rotate(-135deg) scale(.5);
+}
+.is-in  [data-e="sym"] { transform: rotate(0deg)   scale(1);  transition-duration: var(--spin); }
+.is-out [data-e="sym"] { transform: rotate(135deg) scale(.5); }
 
 /* 바탕과 사진 — 글자보다 한 박자 먼저 자리를 잡는다.
    글자가 물러난 뒤에도 그림은 그대로 남아 있다가,
